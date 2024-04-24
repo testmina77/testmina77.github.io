@@ -1,6 +1,5 @@
-<!DOCTYPE html><html lang="en">
-<!-- Mirrored from pnrtscr.github.io/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 24 Apr 2024 15:13:26 GMT -->
-<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
@@ -15,120 +14,64 @@
 <meta name="twitter:site" content="@light_shot">
 <meta name="twitter:description" content="Captured with Lightshot">
 <meta name="twitter:image:src" content="lightshot.html">
-<link rel="preconnect" href="../fonts.gstatic.com/index.html">
-<link href="../fonts.googleapis.com/css2.26299.delayed?family=Inter:wght@400;500;900&amp;display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;900&display=swap" rel="stylesheet">
 <style type="text/css">
-
-            .scare {
-                position: fixed;
-
-                top: 0;
-                left: 0;
-
-                height: 100vh;
-                width: 100vw;
-            }
-
-           
-
- 
-
-            .scare {
-                z-index: 1;
-            }
-
-            video#video {
-                height: 100%;
-                width: 100%;
-
-                object-fit: cover;
-            }
-
-            video#video::-webkit-media-controls-enclosure {
-                display:none !important;
-            }
-        </style>
+    .scare {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+    }
+    .scare {
+        z-index: 1;
+    }
+    video#video {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+    video#video::-webkit-media-controls-enclosure {
+        display:none !important;
+    }
+</style>
 </head>
 <body>
 <div class="scare">
-<video id="video" class="video" src="" <!--loop-->></video>
+    <video id="video" class="video" src=""></video>
 </div>
 <script type="text/javascript">
-/*const video = document.getElementById("video");
-            const overlay = document.getElementById("overlay");
-            const declineButton = document.getElementById("decline-button");
-            const acceptButton = document.getElementById("accept-button");
+    const video = document.getElementById("video");
+    let hasClicked;
 
-            let hasClicked;
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-            window.onbeforeunload = function( ) {
-                if(hasClicked) return true;
-            };
+    function start() {
+        const randomVideoNumber = getRandomInt(1, 26); // Get a random number between 1 and 26
+        const randomVideoSrc = `${randomVideoNumber}.mp4`; // Construct the video source URL
+        video.src = randomVideoSrc; // Set the source of the video element to the random video
+        video.play();
+    }
 
-            function buttonClick(event) {
-                event.preventDefault();
-                if(!hasClicked) hasClicked = true;
-                overlay.hidden = true;
-                video.play();
-                videoClick();
-            }
+    function videoClick(event) {
+        if (event) event.preventDefault();
+        // if not fullscreen
+        const { documentElement } = document;
+        if (documentElement.requestFullscreen) documentElement.requestFullscreen();
+        else if (documentElement.mozRequestFullScreen) documentElement.mozRequestFullScreen();
+        else if (documentElement.webkitRequestFullscreen) documentElement.webkitRequestFullscreen();
+        else if (documentElement.msRequestFullscreen) documentElement.msRequestFullscreen();
+    }
 
-            function videoClick(event) {
-                if(event) event.preventDefault();
-                // if not fullscreen
-                const { documentElement } = document;
-                if(documentElement.requestFullscreen) documentElement.requestFullscreen();
-                else if(documentElement.mozRequestFullScreen) documentElement.mozRequestFullScreen();
-                else if(documentElement.webkitRequestFullscreen) documentElement.webkitRequestFullscreen();
-                else if(documentElement.msRequestFullscreen) documentElement.msRequestFullscreen();
-            }
-
-            acceptButton.addEventListener("click", buttonClick);
-            declineButton.addEventListener("click", buttonClick);
-            video.addEventListener("click", videoClick);*/
-
-            const video = document.getElementById("video");
-
-/*window.onbeforeunload = function() {
-    if (hasClicked) return true;
-};*/
-
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function buttonClick(event) {
-    event.preventDefault();
-    if (!hasClicked) hasClicked = true;
-    
-    videoClick();
-}
-functions start(){
-    overlay.hidden = true;
-    const randomVideoNumber = getRandomInt(1, 26); // Get a random number between 1 and 32
-    const randomVideoSrc = `${randomVideoNumber}.mp4`; // Construct the video source URL
-    video.src = randomVideoSrc; // Set the source of the video element to the random video
-    video.play();
-}
-function videoClick(event) {
-    if (event) event.preventDefault();
-    // if not fullscreen
-    const { documentElement } = document;
-    if (documentElement.requestFullscreen) documentElement.requestFullscreen();
-    else if (documentElement.mozRequestFullScreen) documentElement.mozRequestFullScreen();
-    else if (documentElement.webkitRequestFullscreen) documentElement.webkitRequestFullscreen();
-    else if (documentElement.msRequestFullscreen) documentElement.msRequestFullscreen();
-}
-
-video.addEventListener("click", videoClick);
-video.addEventListener('ended', function() {
+    video.addEventListener("click", videoClick);
+    video.addEventListener('ended', function() {
         window.close(); // Close the tab when the video ends
     });
-            start();
 
-        </script>
-
-
+    start(); // Start playing the video when the page loads
+</script>
 </body>
-<!-- Mirrored from pnrtscr.github.io/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 24 Apr 2024 15:13:39 GMT -->
 </html>
