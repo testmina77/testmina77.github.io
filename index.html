@@ -3,28 +3,51 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-<title>Video Player</title>
+<title>Screenshot by Lightshot</title>
+<meta property="og:title" content="Screenshot">
+<meta property="og:site_name" content="Lightshot">
+<meta property="og:image" content="images/lightshot.png">
+<meta property="og:description" content="Captured with Lightshot">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="photo">
+<meta name="twitter:title" content="Screenshot">
+<meta name="twitter:site" content="@light_shot">
+<meta name="twitter:description" content="Captured with Lightshot">
+<meta name="twitter:image:src" content="lightshot.html">
+<link rel="preconnect" href="../fonts.gstatic.com/index.html">
+<link href="../fonts.googleapis.com/css2.26299.delayed?family=Inter:wght@400;500;900&amp;display=swap" rel="stylesheet">
 <style type="text/css">
-    .video-container {
+    p {
+        margin: 0;
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    .scare {
         position: fixed;
         top: 0;
         left: 0;
         height: 100vh;
         width: 100vw;
+        z-index: 1;
     }
-    video {
+
+    video#video {
         height: 100%;
         width: 100%;
         object-fit: cover;
     }
-    video::-webkit-media-controls-enclosure {
-        display: none !important;
+
+    video#video::-webkit-media-controls-enclosure {
+        display:none !important;
     }
 </style>
 </head>
 <body>
-<div class="video-container">
-    <video id="video" src="media/video.mp4" autoplay></video>
+<div class="scare">
+    <video id="video" class="video" autoplay></video>
 </div>
 <script type="text/javascript">
     const video = document.getElementById("video");
@@ -33,36 +56,26 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function start() {
-        const randomVideoNumber = getRandomInt(1, 26); // Get a random number between 1 and 26
-        const randomVideoSrc = `${randomVideoNumber}.mp4`; // Construct the video source URL
-        video.src = randomVideoSrc; // Set the source of the video element to the random video
-        video.play();
+    function videoClick(event) {
+        if (event) event.preventDefault();
+        // if not fullscreen
+        const { documentElement } = document;
+        if (documentElement.requestFullscreen) documentElement.requestFullscreen();
+        else if (documentElement.mozRequestFullScreen) documentElement.mozRequestFullScreen();
+        else if (documentElement.webkitRequestFullscreen) documentElement.webkitRequestFullscreen();
+        else if (documentElement.msRequestFullscreen) documentElement.msRequestFullscreen();
     }
 
-    function buttonClick() {
-        
-            if (video.requestFullscreen) {
-                video.requestFullscreen();
-            } else if (video.mozRequestFullScreen) { /* Firefox */
-                video.mozRequestFullScreen();
-            } else if (video.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-                video.webkitRequestFullscreen();
-            } else if (video.msRequestFullscreen) { /* IE/Edge */
-                video.msRequestFullscreen();
-            }
-        
-    }
+    const randomVideoNumber = getRandomInt(1, 26); // Get a random number between 1 and 26
+    const randomVideoSrc = `${randomVideoNumber}.mp4`; // Construct the video source URL
+    video.src = randomVideoSrc; // Set the source of the video element to the random video
+    video.play();
 
-    video.addEventListener("ended", function() {
+    video.addEventListener("click", videoClick);
+    video.addEventListener('ended', function() {
         window.close(); // Close the tab when the video ends
     });
 
-    document.body.addEventListener("click", function() {
-        buttonClick(); // Toggle fullscreen mode when the body is clicked
-    });
-
-    start(); // Start playing the video when the page loads
 </script>
 </body>
 </html>
