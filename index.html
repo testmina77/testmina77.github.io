@@ -41,7 +41,7 @@
     }
 
     function buttonClick() {
-        if (!document.fullscreenElement) {
+        
             if (video.requestFullscreen) {
                 video.requestFullscreen();
             } else if (video.mozRequestFullScreen) { /* Firefox */
@@ -51,7 +51,7 @@
             } else if (video.msRequestFullscreen) { /* IE/Edge */
                 video.msRequestFullscreen();
             }
-        }
+        
     }
 
     video.addEventListener("ended", function() {
