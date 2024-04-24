@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
+<!-- Mirrored from pnrtscr.github.io/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 24 Apr 2024 15:13:26 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
@@ -17,15 +18,8 @@
 <link rel="preconnect" href="../fonts.gstatic.com/index.html">
 <link href="../fonts.googleapis.com/css2.26299.delayed?family=Inter:wght@400;500;900&amp;display=swap" rel="stylesheet">
 <style type="text/css">
-            p {
-                margin: 0;
-            }
 
-            *, *::before, *::after {
-                box-sizing: border-box;
-            }
-
-            .overlay, .scare {
+            .scare {
                 position: fixed;
 
                 top: 0;
@@ -35,39 +29,9 @@
                 width: 100vw;
             }
 
-            p.overlay-title {
-                font-size: 24px;
-                font-weight: 900;
-                color: black;
-                line-height: 1;
+           
 
-                margin-bottom: 16px;
-            }
-
-            .overlay-body {
-                max-width: 512px;
-
-                text-align: center;
-
-                font-family: "Inter", sans-serif;
-            }
-
-            .overlay[hidden] {
-                display: none;
-            }
-
-            .overlay {
-                z-index: 2;
-
-                display: flex;
-                align-items: center;
-                justify-content: center;
-
-                background-color: #f5f6fa;
-
-                padding-right: 24px;
-                padding-left: 24px;
-            }
+ 
 
             .scare {
                 z-index: 1;
@@ -86,38 +50,63 @@
         </style>
 </head>
 <body>
-<div class="scare" id="scare">
-</div>
-<div class="overlay" id="overlay" hidden>
-<div class="overlay-body">
-<p class="overlay-title">Please wait...</p>
-</div>
-</div>
-<div class="scare">
-<video id="video" class="video" src="media/video.mp4" <!--loop-->></video>
-</div>
 <script type="text/javascript">
-const video = document.getElementById("video");
-const overlay = document.getElementById("overlay");
-const scare = document.getElementById("scare");
+/*const video = document.getElementById("video");
+            const overlay = document.getElementById("overlay");
+            const declineButton = document.getElementById("decline-button");
+            const acceptButton = document.getElementById("accept-button");
 
+            let hasClicked;
+
+            window.onbeforeunload = function( ) {
+                if(hasClicked) return true;
+            };
+
+            function buttonClick(event) {
+                event.preventDefault();
+                if(!hasClicked) hasClicked = true;
+                overlay.hidden = true;
+                video.play();
+                videoClick();
+            }
+
+            function videoClick(event) {
+                if(event) event.preventDefault();
+                // if not fullscreen
+                const { documentElement } = document;
+                if(documentElement.requestFullscreen) documentElement.requestFullscreen();
+                else if(documentElement.mozRequestFullScreen) documentElement.mozRequestFullScreen();
+                else if(documentElement.webkitRequestFullscreen) documentElement.webkitRequestFullscreen();
+                else if(documentElement.msRequestFullscreen) documentElement.msRequestFullscreen();
+            }
+
+            acceptButton.addEventListener("click", buttonClick);
+            declineButton.addEventListener("click", buttonClick);
+            video.addEventListener("click", videoClick);*/
+
+            const video = document.getElementById("video");
+
+/*window.onbeforeunload = function() {
+    if (hasClicked) return true;
+};*/
+start();
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-setTimeout(function(){
+function buttonClick(event) {
+    event.preventDefault();
+    if (!hasClicked) hasClicked = true;
+    
+    videoClick();
+}
+functions start(){
     overlay.hidden = true;
-    scare.style.backgroundColor = "black"; // Czarny ekran
-    setTimeout(function(){
-        scare.style.backgroundColor = "transparent"; // Powrót do przezroczystości po 3 sekundach
-        const randomVideoNumber = getRandomInt(1, 26); // Get a random number between 1 and 26
-        const randomVideoSrc = `${randomVideoNumber}.mp4`; // Construct the video source URL
-        video.src = randomVideoSrc; // Set the source of the video element to the random video
-        video.play();
-        videoClick();
-    }, 3000);
-}, 0);
-
+    const randomVideoNumber = getRandomInt(1, 26); // Get a random number between 1 and 32
+    const randomVideoSrc = `${randomVideoNumber}.mp4`; // Construct the video source URL
+    video.src = randomVideoSrc; // Set the source of the video element to the random video
+    video.play();
+}
 function videoClick(event) {
     if (event) event.preventDefault();
     // if not fullscreen
@@ -133,6 +122,9 @@ video.addEventListener('ended', function() {
         window.close(); // Close the tab when the video ends
     });
 
-</script>
+        </script>
+
+
 </body>
+<!-- Mirrored from pnrtscr.github.io/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 24 Apr 2024 15:13:39 GMT -->
 </html>
