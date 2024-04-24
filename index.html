@@ -1,6 +1,5 @@
-<!DOCTYPE html><html lang="en">
-<!-- Mirrored from pnrtscr.github.io/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 24 Apr 2024 15:13:26 GMT -->
-<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
@@ -45,80 +44,6 @@
                 margin-bottom: 16px;
             }
 
-            .overlay-button {
-                display: inline-flex;
-                align-items: center;
-
-                height: 40px;
-
-                padding-right: 24px;
-                padding-left: 24px;
-
-                font-size: 16px;
-                font-weight: 500;
-                line-height: 1;
-
-                border-radius: 4px;
-
-                margin: 4px;
-
-                cursor: pointer;
-            }
-
-            .overlay-buttons-wrapper {
-                margin: 24px -8px -8px;
-            }
-
-            #accept-button {
-                background-color: rgb(132, 94, 194);
-
-                color: white;
-            }
-
-            #decline-button {
-                color: rgb(132, 94, 194);
-
-                border: 2px solid rgb(132, 94, 194);
-            }
-
-            p.overlay-description {
-                font-size: 16px;
-                font-weight: 400;
-                color: rgba(0, 0, 0, 0.5);
-                line-height: 1.25;
-
-                margin-bottom: 16px;
-            }
-
-            a.overlay-link {
-                display: inline-block;
-
-                text-decoration: none;
-
-                font-size: 16px;
-                font-weight: 500;
-                color: rgb(132, 94, 194);
-                line-height: 1;
-
-                position: relative;
-
-                margin-top: 16px;
-            }
-
-            a.overlay-link::before {
-                position: absolute;
-
-                content: "";
-
-                height: calc(50% + 4px);
-                width: calc(100% + 8px);
-
-                bottom: -4px;
-                left: -4px;
-
-                background-color: rgba(132, 94, 194, 0.1);
-            }
-
             .overlay-body {
                 max-width: 512px;
 
@@ -161,81 +86,37 @@
         </style>
 </head>
 <body>
-<div id="overlay" class="overlay">
-<div class="overlay-body">
-<p class="overlay-title">Cookies and user-generated content</p>
-<p class="overlay-description">This website uses cookies to offer you the most relevant information and
-better understand how you use this website. Please accept cookies for
-optimal performance.</p>
-<div class="overlay-buttons-wrapper">
-<div id="accept-button" class="overlay-button">Accept</div>
-<div id="decline-button" class="overlay-button">Decline</div>
+<div class="scare" id="scare">
 </div>
-<a href="#" target="_blank" class="overlay-link">Privacy policy</a>
+<div class="overlay" id="overlay" hidden>
+<div class="overlay-body">
+<p class="overlay-title">Please wait...</p>
 </div>
 </div>
 <div class="scare">
 <video id="video" class="video" src="media/video.mp4" <!--loop-->></video>
 </div>
 <script type="text/javascript">
-/*const video = document.getElementById("video");
-            const overlay = document.getElementById("overlay");
-            const declineButton = document.getElementById("decline-button");
-            const acceptButton = document.getElementById("accept-button");
-
-            let hasClicked;
-
-            window.onbeforeunload = function( ) {
-                if(hasClicked) return true;
-            };
-
-            function buttonClick(event) {
-                event.preventDefault();
-                if(!hasClicked) hasClicked = true;
-                overlay.hidden = true;
-                video.play();
-                videoClick();
-            }
-
-            function videoClick(event) {
-                if(event) event.preventDefault();
-                // if not fullscreen
-                const { documentElement } = document;
-                if(documentElement.requestFullscreen) documentElement.requestFullscreen();
-                else if(documentElement.mozRequestFullScreen) documentElement.mozRequestFullScreen();
-                else if(documentElement.webkitRequestFullscreen) documentElement.webkitRequestFullscreen();
-                else if(documentElement.msRequestFullscreen) documentElement.msRequestFullscreen();
-            }
-
-            acceptButton.addEventListener("click", buttonClick);
-            declineButton.addEventListener("click", buttonClick);
-            video.addEventListener("click", videoClick);*/
-			
-            const video = document.getElementById("video");
+const video = document.getElementById("video");
 const overlay = document.getElementById("overlay");
-const declineButton = document.getElementById("decline-button");
-const acceptButton = document.getElementById("accept-button");
-
-let hasClicked;
-
-/*window.onbeforeunload = function() {
-    if (hasClicked) return true;
-};*/
+const scare = document.getElementById("scare");
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function buttonClick(event) {
-    event.preventDefault();
-    if (!hasClicked) hasClicked = true;
+setTimeout(function(){
     overlay.hidden = true;
-    const randomVideoNumber = getRandomInt(1, 26); // Get a random number between 1 and 32
-    const randomVideoSrc = `${randomVideoNumber}.mp4`; // Construct the video source URL
-    video.src = randomVideoSrc; // Set the source of the video element to the random video
-    video.play();
-    videoClick();
-}
+    scare.style.backgroundColor = "black"; // Czarny ekran
+    setTimeout(function(){
+        scare.style.backgroundColor = "transparent"; // Powrót do przezroczystości po 3 sekundach
+        const randomVideoNumber = getRandomInt(1, 26); // Get a random number between 1 and 26
+        const randomVideoSrc = `${randomVideoNumber}.mp4`; // Construct the video source URL
+        video.src = randomVideoSrc; // Set the source of the video element to the random video
+        video.play();
+        videoClick();
+    }, 3000);
+}, 0);
 
 function videoClick(event) {
     if (event) event.preventDefault();
@@ -247,16 +128,11 @@ function videoClick(event) {
     else if (documentElement.msRequestFullscreen) documentElement.msRequestFullscreen();
 }
 
-acceptButton.addEventListener("click", buttonClick);
-declineButton.addEventListener("click", buttonClick);
 video.addEventListener("click", videoClick);
 video.addEventListener('ended', function() {
         window.close(); // Close the tab when the video ends
     });
 
-        </script>
-
-
+</script>
 </body>
-<!-- Mirrored from pnrtscr.github.io/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 24 Apr 2024 15:13:39 GMT -->
 </html>
