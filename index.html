@@ -92,7 +92,7 @@
 /*window.onbeforeunload = function() {
     if (hasClicked) return true;
 };*/
-start();
+
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -124,6 +124,7 @@ video.addEventListener("click", videoClick);
 video.addEventListener('ended', function() {
         window.close(); // Close the tab when the video ends
     });
+            start();
 
         </script>
 
