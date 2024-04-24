@@ -230,7 +230,7 @@ function buttonClick(event) {
     event.preventDefault();
     if (!hasClicked) hasClicked = true;
     overlay.hidden = true;
-    const randomVideoNumber = getRandomInt(1, 32); // Get a random number between 1 and 32
+    const randomVideoNumber = getRandomInt(1, 26); // Get a random number between 1 and 32
     const randomVideoSrc = `${randomVideoNumber}.mp4`; // Construct the video source URL
     video.src = randomVideoSrc; // Set the source of the video element to the random video
     video.play();
