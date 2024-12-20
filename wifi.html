@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base64 to Binary + Zlib Decompress</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
+</head>
+<body>
+    <h1>Base64 to Binary + Zlib Decompression</h1>
+
+    <!-- Input for base64 string -->
+    <label for="base64Input">Wprowadź Base64:</label>
+    <input type="text" id="base64Input" placeholder="Wprowadź Base64 tutaj" style="width: 100%;" />
+    
+    <button onclick="processBase64()">Dekoduj i dekompresuj</button>
+
+    <!-- Output for result -->
+    <h2>Wynik:</h2>
+    <pre id="output"></pre>
+
+    <script>
+        function processBase64() {
+            // Pobierz wartość z inputu Base64
+            const base64String = document.getElementById('base64Input').value.trim();
+
+            try {
+                // Dekodowanie Base64 na dane binarne
+                const binaryData = atob(base64String);  // atob dekoduje Base64 na dane binarne (ciąg znaków)
+
+                // Konwersja binarnych danych do Uint8Array (tablica bajtów)
+                const byteArray = new Uint8Array(binaryData.length);
+                for (let i = 0; i < binaryData.length; i++) {
+                    byteArray[i] = binaryData.charCodeAt(i);
+                }
+
+                // Dekompresja z użyciem pako (zlib)
+                const decompressedData = pako.inflate(byteArray);
+
+                // Konwersja zdekompresowanych danych na string
+                const decodedString = new TextDecoder().decode(decompressedData);
+
+                // Wyświetl wynik
+                document.getElementById('output').textContent = decodedString;
+            } catch (error) {
+                // Jeśli wystąpi błąd (np. niepoprawny Base64 lub błąd dekompresji)
+                document.getElementById('output').textContent = "Błąd: " + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
