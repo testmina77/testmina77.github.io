@@ -1,0 +1,32 @@
+# Skrypt zapisujący KMS_VL_ALL_AIO.cmd do pliku i uruchamiający go jako administrator
+
+# Zawartość pliku .cmd, zamiast pobierania z internetu
+$cmdContent = @"
+
+"@
+
+# Funkcja do sprawdzania, czy skrypt jest uruchomiony jako administrator
+function Test-Admin {
+    $isAdmin = [bool]([Security.Principal.WindowsIdentity]::GetCurrent().Groups -match 'S-1-5-32-544')
+    return $isAdmin
+}
+
+# Jeśli skrypt nie jest uruchomiony jako administrator, uruchomić ponownie z uprawnieniami administratora
+if (-not (Test-Admin)) {
+    Write-Host "Re-running the script as Administrator..."
+    $argList = "$($myinvocation.MyCommand.Definition)"
+    Start-Process powershell -ArgumentList "-Command $argList" -Verb RunAs
+    return
+}
+
+# Tworzenie tymczasowego pliku .cmd
+$rand = [Guid]::NewGuid().Guid
+$FilePath = "$env:SystemRoot\Temp\ACTIVATOR_$rand.cmd"
+Set-Content -Path $FilePath -Value $cmdContent
+
+# Uruchomienie pliku .cmd jako administrator
+$env:ComSpec = "$env:SystemRoot\system32\cmd.exe"
+Start-Process -FilePath $env:ComSpec -ArgumentList "/c """"$FilePath"" $args""" -Wait
+
+# Usunięcie pliku po wykonaniu
+Remove-Item $FilePath
