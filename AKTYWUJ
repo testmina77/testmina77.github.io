@@ -1,0 +1,60 @@
+# Skrypt pobierający i uruchamiający KMS_VL_ALL_AIO.cmd jako administrator
+
+$URLs = @(
+    'https://github.com/abbodi1406/KMS_VL_ALL_AIO/raw/refs/heads/master/KMS_VL_ALL_AIO.cmd'
+)
+
+# Funkcja do sprawdzania, czy skrypt jest uruchomiony jako administrator
+function Test-Admin {
+    $isAdmin = [bool]([Security.Principal.WindowsIdentity]::GetCurrent().Groups -match 'S-1-5-32-544')
+    return $isAdmin
+}
+
+# Jeśli skrypt nie jest uruchomiony jako administrator, uruchomić ponownie z uprawnieniami administratora
+if (-not (Test-Admin)) {
+    Write-Host "Re-running the script as Administrator..."
+    $argList = "$($myinvocation.MyCommand.Definition)"
+    Start-Process powershell -ArgumentList "-Command $argList" -Verb RunAs
+    return
+}
+
+# Pobranie skryptu
+foreach ($URL in $URLs | Sort-Object { Get-Random }) {
+    try { 
+        $response = Invoke-WebRequest -Uri $URL -UseBasicParsing
+        break
+    } catch {}
+}
+
+# Jeśli pobieranie nie powiodło się, zakończ skrypt
+if (-not $response) {
+    Write-Host "Failed to retrieve the script from any of the available repositories, aborting!"
+    return
+}
+
+# Sprawdzanie integralności pliku
+$expectedHash = '7978e85e4523453185e4dfe185536ac4c41c6482b175c13a1aeab52f02fdcf87'
+$stream = New-Object IO.MemoryStream
+$writer = New-Object IO.StreamWriter $stream
+$writer.Write($response.Content)
+$writer.Flush()
+$stream.Position = 0
+$hash = [BitConverter]::ToString([Security.Cryptography.SHA256]::Create().ComputeHash($stream)) -replace '-'
+
+if ($hash -ne $expectedHash) {
+    Write-Warning "Hash mismatch ($hash), aborting! The file integrity is compromised."
+    $response = $null
+    return
+}
+
+# Tworzenie tymczasowego pliku .cmd
+$rand = [Guid]::NewGuid().Guid
+$FilePath = "$env:SystemRoot\Temp\KMS_VL_ALL_AIO_$rand.cmd"
+Set-Content -Path $FilePath -Value "@::: $rand `r`n$response.Content"
+
+# Uruchomienie pliku .cmd jako administrator
+$env:ComSpec = "$env:SystemRoot\system32\cmd.exe"
+Start-Process -FilePath $env:ComSpec -ArgumentList "/c """"$FilePath"" $args""" -Wait
+
+# Usunięcie pliku po wykonaniu
+Remove-Item $FilePath

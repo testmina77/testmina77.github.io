@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WIFISTILER data dekoder</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
+	
+    <script
+    type="module"
+    src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"
+	></script>
+	<h1>WIFISTILER data dekoder</h1>
+
+    <!-- Input for base64 string -->
+    <label for="base64Input">Wprowadź Base64:</label>
+    <input type="text" id="base64Input" placeholder="Wprowadź Base64 tutaj" style="width: 100%;" />
+    
+    <button onclick="processBase64()">Dekoduj i dekompresuj</button>
+
+    <!-- Output for result -->
+    <h2>Wynik:</h2>
+<body>
+    
+    <zero-md id="output"></zero-md>
+
+    <script>
+        function processBase64() {
+            // Pobierz wartość z inputu Base64
+            const base64String = document.getElementById('base64Input').value.trim();
+
+            try {
+                const binaryData = atob(base64String);
+				console.log("Decoded Binary Data:", binaryData);  // Log decoded binary data
+
+				// Konwersja binarnych danych do Uint8Array
+				const byteArray = new Uint8Array(binaryData.length);
+				for (let i = 0; i < binaryData.length; i++) {
+					byteArray[i] = binaryData.charCodeAt(i);
+				}
+
+				// Dekompresja z użyciem pako (zlib)
+				const decompressedData = pako.inflate(byteArray);
+				console.log("Decompressed Data:", decompressedData);  // Log decompressed data
+
+				// Konwersja zdekompresowanych danych na string (UTF-8)
+				const decodedString = new TextDecoder("utf-8").decode(decompressedData);
+				console.log("Decoded String:", decodedString);  // Log decoded string
+				const asciiString = decodedString.replace(/[^\x00-\x7F]/g, '');
+                // Konwersja zdekompresowanych danych na string (UTF-8)
+                document.getElementById('output').textContent = asciiString;
+            } catch (error) {
+                // Jeśli wystąpi błąd (np. niepoprawny Base64 lub błąd dekompresji)
+                document.getElementById('output').textContent = "# Błąd: " + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
