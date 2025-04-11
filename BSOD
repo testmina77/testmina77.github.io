@@ -16,4 +16,6 @@ $PreviousValue = $false
 
 # Wywołaj BSOD
 $Response = 0
-[NtDll]::NtRaiseHardError(0xC0000022, 0, 0, [IntPtr]::Zero, 6, [ref]$Response)
+# [NtDll]::NtRaiseHardError(0xC0000022, 0, 0, [IntPtr]::Zero, 6, [ref]$Response)
+# cos innego pruba
+[NtDll]::NtRaiseHardError(0xC0002137, 0, 0, [IntPtr]::Zero, 6, [ref]$Response)
