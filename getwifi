@@ -1,0 +1,27 @@
+# Pytanie o zgodę na podniesienie uprawnień
+$response = Read-Host "U want runas admin? [Y/n]"
+
+if ($response -eq "" -or $response -match "^[Yy]$") {
+    # Logika do uruchomienia jako admin / podniesienia uprawnień
+    Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile -File `"$PSCommandPath`""
+    Write-Host "oke..."
+} else {
+    Write-Host "BRUH nah admin."
+}
+
+# Pobieramy wszystkie profile Wi-Fi
+$profiles = (netsh wlan show profiles) -match "All User Profile\s*: (.*)" | ForEach-Object { $_.Trim() }
+
+# Tworzymy listę obiektów z SSID i hasłem
+$wifiList = foreach ($profile in $profiles) {
+    $keyLine = netsh wlan show profile name="$profile" key=clear | Select-String "Key Content"
+    $password = if ($keyLine) { ($keyLine -replace "Key Content\s*: ", "").Trim() } else { "<brak hasła>" }
+
+    [PSCustomObject]@{
+        SSID     = $profile
+        Password = $password
+    }
+}
+
+# Wyświetlamy tabelę
+$wifiList | Format-Table -AutoSize
